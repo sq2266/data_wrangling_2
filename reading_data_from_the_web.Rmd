@@ -32,3 +32,81 @@ html_table(header = TRUE) |>
   first()
 ```
 
+
+CSS select
+```{r}
+swm_url = "https://www.imdb.com/list/ls070150896/"
+swm_html = read_html(swm_url)
+```
+
+```{r}
+swm_title_vsc = 
+swm_html |>
+  html_elements(".ipc-title-link-wrapper .ipc-title__text") |>
+  html_text()
+
+swm_runtime_vsc=
+swm_html |>
+  html_elements(".metacritic-score-box")|>
+  html_text()
+
+swm_score_vsc=
+  swm_html |>
+  html_elements(".dli-title-metadata-item:nth-child(2)") |>
+  html_text()
+  
+  swm_df =
+    tibble(
+      title = title_vec,
+    score = metascore_vec,
+    runtime = runtime_vec
+    )
+```
+
+
+import some books
+```{r}
+books_html = read_html("http://books.toscrape.com")
+books_html = read_html(url)
+```
+
+```{r}
+books_titles = 
+  books_html |>
+  html_elements("h3") |>
+  html_text2()
+
+books_price = 
+  books_html |>
+  html_elements(".price_color") |>
+  html_text()
+
+```
+
+
+##API:
+
+get water data
+```{r}
+nyc_water = 
+  GET("https://data.cityofnewyork.us/resource/ia2d-e54m.csv") |> 
+  content("parsed")
+```
+
+```{r}
+brfss_smart2010 = 
+  GET("https://chronicdata.cdc.gov/resource/acme-vg9e.csv",
+      query = list("$limit" = 5000)) |> 
+  content("parsed")
+```
+
+
+Pokemon API
+```{r}
+poke = 
+  GET("http://pokeapi.co/api/v2/pokemon/1") |>
+  content()
+
+```
+
+
