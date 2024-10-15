@@ -149,3 +149,52 @@ as.numeric(sex_vec)
 ```
 
     ## [1] 1 1 2 2
+
+## revisit lots of examples
+
+``` r
+url = "http://samhda.s3-us-gov-west-1.amazonaws.com/s3fs-public/field-uploads/2k15StateFiles/NSDUHsaeShortTermCHG2015.htm"
+drug_use_html = read_html(url)
+
+drug_use_html
+```
+
+    ## {html_document}
+    ## <html lang="en">
+    ## [1] <head>\n<link rel="P3Pv1" href="http://www.samhsa.gov/w3c/p3p.xml">\n<tit ...
+    ## [2] <body>\r\n\r\n<noscript>\r\n<p>Your browser's Javascript is off. Hyperlin ...
+
+``` r
+major_use_df = 
+  drug_use_html |>
+  html_table() |>
+  first() |>
+  slice(-1)|>
+  select(-contains("P Value"))|>
+  pivot_longer(
+    cols= -State,
+    names_to = "age_year",
+    values_to = "percent"
+  )|>
+  separate(age_year, into = c("age", "year"), sep = "\\(")|>
+  mutate(
+    year = str_replace(year, "\\)", ""),
+    percent = str_remove(percent,"[a-c]$"),
+    percent = as.numeric(percent)
+  )
+```
+
+``` r
+major_use_df|>
+  filter(
+    age == "12-17"
+    )|>
+  mutate(
+    State = fct_reorder(State,percent)
+  ) |>
+  ggplot(aes(x=State, y = percent, color = year))+
+  geom_point() +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5,hjust = 1))
+```
+
+![](strings_and_factors_files/figure-gfm/unnamed-chunk-12-1.png)<!-- -->
